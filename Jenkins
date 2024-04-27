@@ -1,0 +1,40 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    // Build Docker image
+                    dockerImage = docker.build('my-website')
+                }
+            }
+        }
+        
+        stage('Test') {
+            steps {
+                // You can add test steps here if needed
+            }
+        }
+        
+        stage('Deploy') {
+            steps {
+                // Push the Docker image to a Docker registry
+                script {
+                    docker.withRegistry('https://registry.example.com', 'docker_credentials') {
+                        dockerImage.push('latest')
+                    }
+                }
+            }
+        }
+    }
+    
+    post {
+        success {
+            echo 'Build and deployment successful!'
+        }
+        failure {
+            echo 'Build or deployment failed!'
+        }
+    }
+}
